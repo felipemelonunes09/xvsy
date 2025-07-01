@@ -35,6 +35,6 @@ class Bootstrap:
         with open(globals.DATA_CONFIG_PATH, 'r', encoding=globals.DATA_CONFIG_ENCODING) as configFile:
             configObject = yaml.safe_load(configFile)
             configuration = Configuration()
-            configuration.load(configObject, globals.WORKING_DIR_PATH)
-
+            configuration.load(configObject, globals.WORKING_DIR_PATH, globals.DEBUG_MODE)
+        print(f"[Bootstrap] (+) Configuration loaded --debug={globals.DEBUG_MODE}")
         return Bootstrap.Context(configuration)

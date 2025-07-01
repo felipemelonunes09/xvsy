@@ -14,12 +14,14 @@ class Configuration:
 
     __loaded__: bool = False
 
-    def load(self, configObject: dict[str, any], workingPath: Path):
+    def load(self, configObject: dict[str, any], workingPath: Path, debug: bool):
         Configuration.engine_version            = configObject["engine"]["version"]
         Configuration.engine_fps                = configObject["engine"]["fps"]
         Configuration.engine_resolution         = tuple(configObject["engine"]["resolution"])
         Configuration.engine_PATH               = workingPath
         Configuration.engine_assets_dir         = workingPath / 'assets'
         Configuration.game_style_frame_offset   = 150
+        Configuration.debug                     = debug        
+        Configuration.debug_area_color          = (255, 0, 0)
         Configuration.__loaded__                = True    
 

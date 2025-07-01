@@ -40,7 +40,7 @@ class Xvsy(GameInstance):
 
     def setup(self):
 
-        self.runeDeck   = RuneDeck()
+        self.runeDeck   = RuneDeck(position=(50, 300))
         self.gameState  = GameState()
 
         self.player     = Player()
@@ -48,5 +48,6 @@ class Xvsy(GameInstance):
         self.table      = Table()
 
         self.getSprites().add(self.table)
+        self.getSprites().add(self.runeDeck)
         self.engine.setBackground(pygame.image.load(Configuration.engine_assets_dir / 'images' / 'background.png'))
 
