@@ -8,7 +8,14 @@ class EngineClick:
         self.__rect = rect
 
     def __call__(self, function: Callable, *args, **kwargs):
-        Engine.register(type="click", f=function, rect=self.__rect)
         def wrapper(*args, **kwargs):
             return function(*args, **kwargs)
+        
+        def register(ref: object):
+            Engine.eventFunctionBind(wrapper.__hash__(), ref)
+                
+        wrapper.__EngineEventFunction__ = True
+        wrapper.__EngineEventFunctionBind__ = register
+        
+        Engine.eventFunctionRegister(type="click", f=wrapper, rect=self.__rect)
         return wrapper

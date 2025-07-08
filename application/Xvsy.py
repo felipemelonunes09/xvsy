@@ -1,4 +1,6 @@
 
+from __future__ import annotations
+
 import pygame
 
 from application.entities.Enemy import Enemy
@@ -19,24 +21,25 @@ class GameState:
     def __init__(self):
         self.__state = GameState.State.START
 
-    def current(self):
-        pass
+    def current(self) -> GameState.State:
+        return self.__state 
 
     def next(self):
-        pass
+        match self.__state:
+            case GameState.State.START:
+                self.__state = GameState.State.PLAYER_TURN
 
 class Xvsy(GameInstance):
 
     def update(self):
         match self.gameState.current():
             case GameState.State.START:
-                self.runeDeck.shuffle()
+                self.gameState.next()
             case GameState.State.PLAYER_TURN:
-                self.player.update()
-            case GameState.State.ENEMY_TURN:
-                self.enemy.update()
+                if self.runeDeck.isClicked():
+                    newRune = self.runeDeck.next()
+                    self.'player'
 
-        self.gameState.next()
 
     def setup(self):
 

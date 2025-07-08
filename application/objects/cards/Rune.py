@@ -9,6 +9,7 @@ class IRune(metaclass=ABCMeta):
     pass
 
 class RuneCard(Card, IRune):
+    
     class Type(Enum):
         R_NUMERIC_0             = "card-numeric-rune-00"
         R_NUMERIC_1             = "card-numeric-rune-01"

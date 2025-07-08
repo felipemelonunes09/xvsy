@@ -3,7 +3,7 @@ from __future__ import annotations
 from typing import Callable
 from config.Configuration import Configuration
 from core.Bootstrap import Bootstrap
-from core.FunctionManager import FunctionManager
+from core.events.EventFunctionManager import EventFunctionManager
 from core.loggers import engineInfo, engineLog
 from abc import ABC, abstractmethod
 
@@ -18,7 +18,7 @@ class Bridge:
         return self.__engine.setBackground(surface)
 
 class Engine:
-    functionManager: FunctionManager = FunctionManager()
+    functionManager: EventFunctionManager = EventFunctionManager()
     def __init__(self, context: Bootstrap.Context, gameInstance: GameInstance):
 
         self.__context          :Bootstrap.Context       = context
@@ -48,8 +48,9 @@ class Engine:
                 self.__screen.blit(self.__background, (0, 0))
 
             if Configuration.debug:
-                for functionData in Engine.functionManager.getClickEvents():
-                    pygame.draw.rect(self.__screen, Configuration.debug_area_color, functionData[1], width=2)
+                clickEvents = Engine.functionManager.getClickEvents()
+                for key in clickEvents:
+                    pygame.draw.rect(self.__screen, Configuration.debug_area_color, clickEvents[key][EventFunctionManager.RECT], width=2)
             self.__gameInstance.getSprites().draw(self.__screen)            
 
     def setRunning(self, running: bool):
@@ -66,18 +67,22 @@ class Engine:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if event.button == 1:  
                     engineInfo("\tLeft mouse button clicked at position: " + str(event.pos))
-                    for rFunctionData in Engine.functionManager.getClickEvents():
-                        f, rect = rFunctionData
-                        if rect.collidepoint(event.pos):
-                            engineInfo(f"\t\tExecuting click event {f.__name__} at position {event.pos}")
-                            f(event)
+                    clickEvents = Engine.functionManager.getClickEvents()
+                    for key in clickEvents:
+                        if clickEvents[key][EventFunctionManager.RECT].collidepoint(event.pos):
+                            engineInfo(f"\t\tExecuting click event {clickEvents[key][0]} at position {event.pos}")
+                            clickEvents[key][EventFunctionManager.FUNCTION](clickEvents[key][EventFunctionManager.REFERENCE], event)
 
     @staticmethod
-    def register(type: str, f: Callable, rect: pygame.Rect = None):
+    def eventFunctionRegister(type: str, f: Callable, rect: pygame.Rect = None):
         engineLog(f"Registering event handler for type '{type}' with function {f.__name__} and rect {rect}")
         match type:
             case "click": 
                 Engine.functionManager.addClickEvent(f, rect)
+    @staticmethod
+    def eventFunctionBind(fhash: int, reference: object):
+        engineInfo(f"Binding event function with fhash {fhash}")
+        Engine.functionManager.getClickEvents()[fhash][2] = reference
 
 class IGameInstance(ABC):
     
