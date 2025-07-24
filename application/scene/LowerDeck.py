@@ -10,3 +10,7 @@ class LowerDeck(pygame.sprite.Group):
         super().__init__(*a, **k)
         self.runesFrame = [RuneFrame(position=[position[0] + index*Configuration.game_style_frame_offset, position[1]]) for index in range(7)]
         self.add(*self.runesFrame)
+        self.__hasDroppedRune = False
+
+    def hasDroppedRune(self) -> bool:
+        return self.__hasDroppedRune

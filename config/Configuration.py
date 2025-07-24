@@ -23,5 +23,6 @@ class Configuration:
         Configuration.game_style_frame_offset   = 150
         Configuration.debug                     = debug        
         Configuration.debug_area_color          = (255, 0, 0)
+        Configuration.card_scale                = (100, 100)
         Configuration.__loaded__                = True    
 

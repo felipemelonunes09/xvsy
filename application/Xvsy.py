@@ -3,9 +3,7 @@ from __future__ import annotations
 
 import pygame
 
-from application.entities.Enemy import Enemy
 from application.objects.Table import Table
-from application.scene.LowerDeck import LowerDeck
 from core.Engine import GameInstance
 from application.objects.RuneDeck import RuneDeck
 from application.entities.Player import Player
@@ -36,21 +34,24 @@ class Xvsy(GameInstance):
             case GameState.State.START:
                 self.gameState.next()
             case GameState.State.PLAYER_TURN:
-                if self.runeDeck.isClicked():
+                if self.runeDeck.isClikedAndConsume():
                     newRune = self.runeDeck.next()
-                    self.'player'
+                    self.getEngine().startDrag(cursorSprite=newRune, payload={"rune": newRune})
+                    self.getSprites().add(newRune)
 
+                if self.player.getRuneFrame().hasDroppedRune():
+                    self.gameState.next()
 
     def setup(self):
-
+ 
         self.runeDeck   = RuneDeck(position=(50, 300))
         self.gameState  = GameState()
 
-        self.player     = Player()
-        self.enemy      = Enemy()
+        self.player     = Player(lowerDeckPosition=(125, 500))
+        #self.enemy      = Enemy()
         self.table      = Table()
 
-        self.getSprites().add(self.table)
-        self.getSprites().add(self.runeDeck)
+        self.addSprite(self.table).addSprite(self.runeDeck).addSprite(self.player)
+
         self.engine.setBackground(pygame.image.load(Configuration.engine_assets_dir / 'images' / 'background.png'))
 
