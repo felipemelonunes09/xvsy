@@ -51,7 +51,8 @@ class Xvsy(GameInstance):
         #self.enemy      = Enemy()
         self.table      = Table()
 
-        self.addSprite(self.table).addSprite(self.runeDeck).addSprite(self.player)
+        self.addSprite(self.table)
+        self.addSprite(self.runeDeck).addSprite(self.player)
 
         self.engine.setBackground(pygame.image.load(Configuration.engine_assets_dir / 'images' / 'background.png'))
 

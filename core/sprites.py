@@ -12,7 +12,7 @@ class EngineSpriteGroup(pygame.sprite.Group):
             if callable(attr):
                 if getattr(attr, "__EngineEventFunction__", False):
                     bind = getattr(attr, "__EngineEventFunctionBind__", None)
-                    engineLog(f"[✓] Método '{attr_name}' está marcado como __EngineEventFunction__")
+                    engineLog(f"[✓] Method '{attr_name}' is marked as __EngineEventFunction__")
                     engineInfo(f"\t --> Binding function {bind}")
                     bind(self)
                     

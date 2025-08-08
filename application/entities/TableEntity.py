@@ -1,18 +1,21 @@
 
 import pygame
-from application.entities.hands.RuneHand import RuneHand
+from application.entities.hands.RuneHand import CardHand
 from application.scene.LowerDeck import LowerDeck
 
 class TableEntity(pygame.sprite.Group):
     def __init__(self, lowerDeckPosition = (0, 0), *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.__runeHand = RuneHand()
+
+        self.__cardHand = CardHand()
         self.__runeDeck = LowerDeck(position=lowerDeckPosition)
 
         self.add(self.__runeDeck)
+        self.add(self.__cardHand)
 
-    def getRuneHand(self) -> RuneHand:
-        return self.__runeHand
+    def getCardHand(self) -> CardHand:
+        return self.__cardHand
     
     def getRuneFrame(self) -> LowerDeck:
         return self.__runeDeck
+    

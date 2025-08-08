@@ -1,8 +1,8 @@
 import pygame
 
-from application.objects.cards.Rune import RuneCard
+from application.objects.cards.Rune import Card
 
-class RuneHand(pygame.sprite.Group):
+class CardHand(pygame.sprite.Group):
     def __init__(self):
         super().__init__()
         self.__runeHandLimit = 7
@@ -14,15 +14,15 @@ class RuneHand(pygame.sprite.Group):
     def setHidden(self, hidden: bool):
         self.__isHidden = hidden
 
-    def addRune(self, rune: RuneCard):
+    def addCard(self, rune: Card):
         if len(self) < self.__runeHandLimit:
             self.add(rune)
 
-    def removeRune(self, index: int):
+    def removeCard(self, index: int):
         if 0 <= index < len(self):
             spriteList = list(self.sprites())
             self.remove(spriteList[index])
 
-    def removeRune(self, rune: RuneCard):
+    def removeCard(self, rune: Card):
         if rune in self:
             self.remove(rune)
