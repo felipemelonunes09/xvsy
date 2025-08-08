@@ -92,6 +92,8 @@ class Engine:
                             if rect.collidepoint(e.pos):
                                 engineInfo(f"\t\tExecuting click event {clickEvents[key][0]} at position {e.pos}")
                                 event = Event(dragObject=self.eventFunctionManager.globalState.getDragObject(), gameEvent=e)
+                                print(clickEvents[key])
+                                print("=============================================================")
                                 clickEvents[key][EventFunctionManager.FUNCTION](clickEvents[key][EventFunctionManager.REFERENCE], event=event)
 
     @staticmethod
@@ -102,7 +104,7 @@ class Engine:
                 Engine.eventFunctionManager.addClickEvent(f, rect)
     @staticmethod
     def eventFunctionBind(fhash: int, reference: object):
-        engineInfo(f"Binding event function with fhash {fhash}")
+        engineInfo(f"Binding event function with fhash {fhash} and reference {reference}")
         Engine.eventFunctionManager.getClickEvents()[fhash][2] = reference
 
 class IGameInstance(ABC):
