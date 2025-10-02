@@ -4,10 +4,10 @@ from application.entities.hands.RuneHand import CardHand
 from application.scene.LowerDeck import LowerDeck
 
 class TableEntity(pygame.sprite.Group):
-    def __init__(self, lowerDeckPosition = (0, 0), *args, **kwargs):
+    def __init__(self, lowerDeckPosition = (0, 0), cardHandPosition = (0, 0), *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.__cardHand = CardHand()
+        self.__cardHand = CardHand(position=cardHandPosition)
         self.__runeDeck = LowerDeck(position=lowerDeckPosition)
 
         self.add(self.__runeDeck)

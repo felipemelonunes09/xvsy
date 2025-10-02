@@ -5,11 +5,12 @@ from application.objects.cards.Card import Card
 from config.Configuration import Configuration
 from abc import ABCMeta, ABC
 
+
 class IRune(metaclass=ABCMeta):
     pass
 
+
 class RuneCard(Card, IRune):
-    
     class Type(Enum):
         R_NUMERIC_0             = "card-numeric-rune-00"
         R_NUMERIC_1             = "card-numeric-rune-01"
@@ -35,3 +36,6 @@ class RuneCard(Card, IRune):
     def getType(self) -> RuneCard.Type:
         return self.__type
     
+    
+    
+

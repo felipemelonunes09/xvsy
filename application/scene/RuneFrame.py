@@ -19,9 +19,8 @@ class RuneFrame(pygame.sprite.Sprite):
 
         super().__init__(*a, **k)
 
-    def onClick(self, *a, **k) -> None:
-        event: Event = k["event"]
-        dragObj = event.getDragObject()
+    def onClick(self, *a, event: Event, **k) -> None:
+        dragObj = event.globalState.getDragObject()
         if dragObj and dragObj.hasCursorSprite() and isinstance(dragObj.getCursorSprite(), RuneCard):
             if (self.__card):
                 self.__card.kill()

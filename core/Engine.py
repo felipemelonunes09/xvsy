@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
 from typing import Callable, Self
 from config.Configuration import Configuration
 from core.Bootstrap import Bootstrap
@@ -43,6 +44,7 @@ class Engine:
         engineInfo("\tStarting game loop...")
 
         while self.__running:
+
             self.__handleEventLoop()
             self.__gameInstance.update()
             self.__gameInstance.getSprites().update()
@@ -60,11 +62,14 @@ class Engine:
                     cursor.rect.center = pos
 
             if Configuration.debug:
-                clickEvents = Engine.eventFunctionManager.getClickEvents()
+                clickEvents = Engine.eventFunctionManager.getEventsListeners(EventFunctionManager.EventType.CLICK)
                 for key in clickEvents:
-                    pygame.draw.rect(self.__screen, Configuration.debug_area_color, clickEvents[key][EventFunctionManager.RECT], width=2)
-            
-            self.__gameInstance.getSprites().draw(self.__screen)            
+                    pygame.draw.rect(self.__screen, Configuration.debug_area_color, clickEvents[key].getPayload().get("rect"), width=2)
+                clickEvents = Engine.eventFunctionManager.getEventsListeners(EventFunctionManager.EventType.MOUSE_MOVE)
+                for key in clickEvents:
+                    pygame.draw.rect(self.__screen, "yellow", clickEvents[key].getPayload().get("rect"), width=2)
+                
+            self.__gameInstance.getSprites().draw(self.__screen)    
 
     def setRunning(self, running: bool):
         self.__running = running
@@ -81,31 +86,20 @@ class Engine:
             if e.type == pygame.QUIT:
                 self.setRunning(False)
             if e.type == pygame.MOUSEBUTTONDOWN:
-                if e.button == 1:  
-                    engineInfo("\tLeft mouse button clicked at position: " + str(e.pos))
-                    clickEvents = Engine.eventFunctionManager.getClickEvents()
-                    for key in clickEvents:
-                        rect: pygame.Rect       = clickEvents[key][EventFunctionManager.RECT]
-                        function: Callable      = clickEvents[key][EventFunctionManager.FUNCTION]
-                        engineBlockWhenDragging = getattr(function, "__EngineEventBlockWhenDragging__", True)
-                        if (engineBlockWhenDragging and self.eventFunctionManager.globalState.isDragging() == False) or engineBlockWhenDragging == False:
-                            if rect.collidepoint(e.pos):
-                                engineInfo(f"\t\tExecuting click event {clickEvents[key][0]} at position {e.pos}")
-                                event = Event(dragObject=self.eventFunctionManager.globalState.getDragObject(), gameEvent=e)
-                                print(clickEvents[key])
-                                print("=============================================================")
-                                clickEvents[key][EventFunctionManager.FUNCTION](clickEvents[key][EventFunctionManager.REFERENCE], event=event)
+                if e.button == 1:
+                    self.eventFunctionManager.Emit(EventFunctionManager.EventType.CLICK, {"event": e})
+            if e.type == pygame.MOUSEMOTION:
+                self.eventFunctionManager.Emit(EventFunctionManager.EventType.MOUSE_MOVE, { "event": SimpleNamespace(pos=pygame.mouse.get_pos())})
+                
+    @staticmethod
+    def registerEventCallback(type: EventFunctionManager.EventType, eventRegister: EventFunctionManager.EventRegister):
+        Engine.eventFunctionManager.On(type, eventRegister)
 
     @staticmethod
-    def eventFunctionRegister(type: str, f: Callable, rect: pygame.Rect = None):
-        engineLog(f"Registering event handler for type '{type}' with function {f.__name__} and rect {rect}")
-        match type:
-            case "click": 
-                Engine.eventFunctionManager.addClickEvent(f, rect)
-    @staticmethod
-    def eventFunctionBind(fhash: int, reference: object):
-        engineInfo(f"Binding event function with fhash {fhash} and reference {reference}")
-        Engine.eventFunctionManager.getClickEvents()[fhash][2] = reference
+    def bindEventObject(type: EventFunctionManager.EventType, function: Callable, ref: object):
+        engineInfo(f"Binding event function with fhash {function.__hash__} and reference {ref}")
+        Engine.eventFunctionManager.getEventsListeners(type)[function.__hash__()].setReference(ref)
+
 
 class IGameInstance(ABC):
     
