@@ -16,6 +16,7 @@ class CardHand(EngineSpriteGroup):
 
         decorator = EngineClick(pygame.Rect(self.getPosition(0), self.getPosition(1), 1030, 95), blockWhenDragging=False)
         self.onClick = decorator(self.onClick)
+        self.__hasDroppedRune = False
 
     def isFull(self) -> bool:
         return len(self) >= self.__runeHandLimit
@@ -49,14 +50,19 @@ class CardHand(EngineSpriteGroup):
                 sprite.kill()
             else:
                 self.addCard(sprite)
+                self.__hasDroppedRune = True
+                
+    def hasDroppedAndConsume(self) -> bool:
+        if self.__hasDroppedRune:
+            self.__hasDroppedRune = False
+            return True
+        return False
 
     @EngineHover(rect=pygame.Rect(200, 200, 100, 200), blockWhenDragging=False)
     def onMouseEnter(self, *args, **kwd):
-        print("Mouse hover")
+        pass
 
     @EngineMouseLeave(rect=pygame.Rect(200, 200, 100, 200), blockWhenDragging=False)
     def onHoverLeave(self, *args, **kwd):
-        print("Mouse leave")
-    
-    def onMouseLeave(self, *args, **kwd):
         pass
+

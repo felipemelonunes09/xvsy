@@ -23,6 +23,7 @@ class EventFunctionManager:
         MOUSE_MOVE  = 2
         MOUSE_ENTER = 3
         MOUSE_LEAVE = 4
+        CUSTOM      = 5 
 
     class Drag:
         def __init__(self, payload: object = None, cursorSprite: pygame.sprite.Sprite = None):
@@ -99,7 +100,6 @@ class EventFunctionManager:
                     function(eventRegister.getReference(), event=Event(**payload))
 
 
-
     class EventRegister:
         def __init__(self, handler: Callable, payload: dict, reference: object, onTriggerRise: EventFunctionManager.EventType, onTriggerFall: EventFunctionManager.EventType):
             self.__handler = handler
@@ -113,7 +113,6 @@ class EventFunctionManager:
             return self.__onTriggerRise
         
         def getOnTriggerFall(self) -> EventFunctionManager.EventType:
-            print(self.__onTriggerFall)
             return self.__onTriggerFall
 
         def getStoredTrigger(self) -> bool:
@@ -156,7 +155,6 @@ class EventFunctionManager:
     def Emit(self, type: EventFunctionManager.EventType, payload: dict = {}):
         ## enforce a global state here
         def reroute(retype: EventFunctionManager.EventType, *a):
-           print("REROUTING", retype)
            self.Dispatcher.reroute(self.getEventsListeners(retype), payload={
                 **payload,
                 "type": retype,
@@ -168,3 +166,4 @@ class EventFunctionManager:
             "type": type,
             "globalState": self.globalState
         },reroute=reroute) 
+

@@ -4,6 +4,7 @@ from types import SimpleNamespace
 from typing import Callable, Self
 from config.Configuration import Configuration
 from core.Bootstrap import Bootstrap
+from core.animations.AnimationBase import Animation
 from core.events.EventFunctionManager import Event, EventFunctionManager
 from core.loggers import engineInfo, engineLog
 from abc import ABC, abstractmethod
@@ -21,6 +22,9 @@ class Bridge:
     def startDrag(self, payload: object, cursorSprite: pygame.sprite.Sprite):
         engineInfo(f"Starting drag with payload: {payload}")
         return self.__engine.getEventFunctionManager().createDrag(EventFunctionManager.Drag(payload, cursorSprite))
+    
+    def addAnimation(self, animation: Animation):
+        self.__engine.getAnimation().append(animation)
 
 class Engine:
     eventFunctionManager: EventFunctionManager = EventFunctionManager()
@@ -32,6 +36,7 @@ class Engine:
         self.__clock            :pygame.time.Clock       = context.clock()
         self.__gameInstance     :GameInstance            = gameInstance
         self.__bridge           :Bridge                  = Bridge(self)
+        self.__animations       :list[Animation]         = []
 
         self.setRunning(False)
 
@@ -46,6 +51,7 @@ class Engine:
         while self.__running:
 
             self.__handleEventLoop()
+            self.__handleAnimationLoop()
             self.__gameInstance.update()
             self.__gameInstance.getSprites().update()
             self.__context.flipOver()
@@ -69,7 +75,10 @@ class Engine:
                 for key in clickEvents:
                     pygame.draw.rect(self.__screen, "yellow", clickEvents[key].getPayload().get("rect"), width=2)
                 
-            self.__gameInstance.getSprites().draw(self.__screen)    
+            self.__gameInstance.getSprites().draw(self.__screen)
+
+    def getAnimation(self) -> list[Animation]:            
+        return self.__animations
 
     def setRunning(self, running: bool):
         self.__running = running
@@ -90,7 +99,14 @@ class Engine:
                     self.eventFunctionManager.Emit(EventFunctionManager.EventType.CLICK, {"event": e})
             if e.type == pygame.MOUSEMOTION:
                 self.eventFunctionManager.Emit(EventFunctionManager.EventType.MOUSE_MOVE, { "event": SimpleNamespace(pos=pygame.mouse.get_pos())})
-                
+
+    def __handleAnimationLoop(self):
+        print(self.__animations)
+        for anim in self.__animations:
+            anim.update(self.__context.delta())
+            if anim.isFinished():
+                self.__animations.remove(anim)
+    
     @staticmethod
     def registerEventCallback(type: EventFunctionManager.EventType, eventRegister: EventFunctionManager.EventRegister):
         Engine.eventFunctionManager.On(type, eventRegister)
@@ -114,6 +130,10 @@ class IGameInstance(ABC):
     @abstractmethod
     def addSprite(self, sprite: pygame.sprite.Sprite) -> Self:
         pass
+
+    @abstractmethod
+    def addAnimation(self, animation: Animation) -> Self:
+        pass
     
     @abstractmethod
     def setup(self):
@@ -132,4 +152,8 @@ class GameInstance(IGameInstance):
     
     def addSprite(self, sprite: pygame.sprite.Sprite | pygame.sprite.Group) -> Self:
         self.getSprites().add(sprite)
+        return self
+    
+    def addAnimation(self, animation: Animation) -> Self:
+        self.getEngine().addAnimation(animation)
         return self

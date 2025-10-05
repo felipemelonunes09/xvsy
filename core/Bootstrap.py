@@ -13,6 +13,7 @@ class Bootstrap:
         def __init__(self, configuration: Configuration):
             self.__screen: pygame.Surface = None
             self.__clock: pygame.time.Clock = None
+            self.__lastTime = pygame.time.get_ticks()
             self.cg = configuration
 
         def screen(self) -> pygame.Surface:
@@ -22,6 +23,12 @@ class Bootstrap:
         def clock(self) -> pygame.time.Clock:
             self.__clock = pygame.time.Clock() if self.__clock is None else self.__clock
             return self.__clock
+        
+        def delta(self) -> float:
+            now = pygame.time.get_ticks()
+            dt = (now - self.__lastTime) / 1000.0
+            self.__lastTime = now
+            return dt
         
         def flipOver(self) -> None:
             pygame.display.flip()

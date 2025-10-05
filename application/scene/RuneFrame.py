@@ -14,10 +14,18 @@ class RuneFrame(pygame.sprite.Sprite):
 
         decorator = EngineClick(pygame.Rect(position[0], position[1], 130, 150), blockWhenDragging=False)
         self.onClick = decorator(self.onClick)
-
+        self.expectedRect = pygame.Rect(position[0], position[1], 130, 150)
         self.__card: RuneCard = None
 
+        self.hasDroppedRune = False
+
         super().__init__(*a, **k)
+
+    def hasCard(self) -> bool:
+        return self.__card is not None
+    
+    def getCard(self) -> RuneCard:
+        return self.__card
 
     def onClick(self, *a, event: Event, **k) -> None:
         dragObj = event.globalState.getDragObject()
@@ -26,4 +34,11 @@ class RuneFrame(pygame.sprite.Sprite):
                 self.__card.kill()
             self.__card = dragObj.getCursorSprite()
             dragObj.invalidate()
+            self.hasDroppedRune = True
+
+    def hasDroppedAndConsume(self) -> bool:
+        if self.hasDroppedRune:
+            self.hasDroppedRune = False
+            return True
+        return False    
 
