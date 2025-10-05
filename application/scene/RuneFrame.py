@@ -26,13 +26,16 @@ class RuneFrame(pygame.sprite.Sprite):
     
     def getCard(self) -> RuneCard:
         return self.__card
+    
+    def setCard(self, runeCard: RuneCard):
+        self.__card = runeCard
 
     def onClick(self, *a, event: Event, **k) -> None:
         dragObj = event.globalState.getDragObject()
         if dragObj and dragObj.hasCursorSprite() and isinstance(dragObj.getCursorSprite(), RuneCard):
             if (self.__card):
                 self.__card.kill()
-            self.__card = dragObj.getCursorSprite()
+            self.setCard(dragObj.getCursorSprite())
             dragObj.invalidate()
             self.hasDroppedRune = True
 

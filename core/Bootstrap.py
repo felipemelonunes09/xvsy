@@ -33,6 +33,7 @@ class Bootstrap:
         def flipOver(self) -> None:
             pygame.display.flip()
             self.clock().tick(60)  
+            self.delta()
 
     def __config__(self) -> Context:
         

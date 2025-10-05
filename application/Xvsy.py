@@ -4,6 +4,7 @@ from __future__ import annotations
 import random
 import pygame
 
+from application.Actions import Actions
 from application.entities.TableEntity import TableEntity
 from application.entities.Enemy import Enemy
 from application.objects.Table import Table
@@ -18,14 +19,15 @@ from core.animations.dd.StaticAnimation import StaticAnimation
 
 class GameState:
     class State:
-        START           ="[gamestate].running"
-        TURN            ="[gamestate].turn"
-        CHANGE          ="[gamestate].change"
-        ENDGAME         ="[gamestate].endgame"
-        __testint_animation_01__ = "[gamestate].__testint_animation_01"
+        START                   ="[gamestate].running"
+        TURN                    ="[gamestate].turn"
+        CHANGE                  ="[gamestate].change"
+        ENDGAME                 ="[gamestate].endgame"
+
+        __getCardFromRuneDeck__ = "[gamestate].__getCardFromRuneDeck__"
 
     def __init__(self):
-        self.__state = GameState.State.__testint_animation_01__
+        self.__state = GameState.State.START
 
     def current(self) -> GameState.State:
         return self.__state 
@@ -47,8 +49,8 @@ class Xvsy(GameInstance):
     def __init__(self):
         super().__init__()
         self.currentEntitys: TableEntity = None
-        self._animation: StaticAnimation | None = None
-        self._last_time = pygame.time.get_ticks()
+        self.__runeDeckAnimation = None
+
 
     def update(self):
 
@@ -56,26 +58,36 @@ class Xvsy(GameInstance):
             case GameState.State.START:
                 self.gameState.next()
                 self.currentEntity = self.player if random.choice([True, False]) else self.enemy
-                self.currentEntity = self.player
                 print(f"First player is {self.currentEntity}")   
+
             case GameState.State.TURN:
-                self.currentEntity.turn()
+                action = self.currentEntity.turn()
                 self.allowEventsIfPlayer()
+                if (action == Actions.GET_CARD_FROM_RUNE_DECK):
+                    self.currentEntity.getRuneCardFromDeck()
+                    if (self.currentEntity == self.enemy):
+                        card = self.runeDeck.next()
+                        position = self.enemy.addRune(card)
+                        self.dealCardForEnemyRuneFrame(position)
 
                 if self.currentEntity.getMana() == 0:
                     self.gameState.next()
+
             case GameState.State.CHANGE:
                 self.currentEntity.refillMana()
                 self.currentEntity = self.enemy if self.currentEntity == self.player else self.player
                 self.gameState.next()
                     
-            case GameState.State.__testint_animation_01__:
-                if self._animation is None:
-                    anim = PlainCard(position=(100, 300), scale=Configuration.card_scale)
-                    self._animation = StaticAnimation(anim, targetPosition=(600, 300), speed=400.0)
-                    self.addAnimation(self._animation)
-                    self._animation.start()
-                    self.addSprite(anim)
+            case GameState.State.__getCardFromRuneDeck__:
+                if self.__runeDeckAnimation is None:
+                    self.dealCardForEnemyRuneFrame(4)
+                    self.__runeDeckAnimation = True
+
+    def dealCardForEnemyRuneFrame(self, position: tuple[int, int]):
+        card = PlainCard(position=(100, 300), scale=Configuration.card_scale)
+        animation = StaticAnimation(card, targetPosition=position, speed=500)
+        self.startAnimation(animation)
+        self.addSprite(card)
 
     def allowEventsIfPlayer(self):
         if self.currentEntity == self.player:

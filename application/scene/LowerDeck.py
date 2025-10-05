@@ -1,5 +1,6 @@
 
 import pygame
+from application.objects.cards.Rune import RuneCard
 from application.scene.RuneFrame import RuneFrame
 from config.Configuration import Configuration
 
@@ -14,3 +15,13 @@ class LowerDeck(pygame.sprite.Group):
 
     def hasDroppedRune(self) -> bool:
         return self.__hasDroppedRune
+    
+    def put(self, index: int, runeCard: RuneCard):
+        self.runesFrame[index].setCard(runeCard)
+
+    def isFull(self) -> bool:
+        for rf in self.runesFrame:
+            if not rf.hasCard():
+                return False
+        return True
+

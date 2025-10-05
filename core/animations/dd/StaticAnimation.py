@@ -9,6 +9,11 @@ class StaticAnimation:
         self.__started = False
         self.__speed = float(speed)
 
+        print(self.__getSpritePos())
+        print(self.__targetPosition)
+
+
+
     def start(self) -> None:
         self.__started = True
         self.__finished = False
@@ -47,6 +52,7 @@ class StaticAnimation:
             self.__finished = True
         else:
             newpos = pos_v + vec.normalize() * step
+            print(newpos)
             self.__setSpritePos(newpos)
 
     def __getSpritePos(self) -> tuple[float, float] | None:

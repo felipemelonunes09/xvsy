@@ -10,6 +10,8 @@ from core.loggers import engineInfo, engineLog
 from abc import ABC, abstractmethod
 
 import pygame
+pygame.font.init()
+
 
 class Bridge:
     def __init__(self, engine: Engine):
@@ -75,7 +77,20 @@ class Engine:
                 for key in clickEvents:
                     pygame.draw.rect(self.__screen, "yellow", clickEvents[key].getPayload().get("rect"), width=2)
                 
+
             self.__gameInstance.getSprites().draw(self.__screen)
+            # Carrega a fonte personalizada (certifique-se de que o arquivo está em ./fonts)
+            fonte = pygame.font.Font("./assets/fonts/MedievalSharp-Regular.ttf", 30)
+
+            # --- Label 1: Atacar Aritmético ---
+            texto_arit = fonte.render("Atacar Aritmético", True, (255, 255, 255))
+            texto_arit_rect = texto_arit.get_rect(center=(1000, 280))
+            self.__context.screen().blit(texto_arit, texto_arit_rect)
+
+            # --- Label 2: Atacar Algébrico ---
+            texto_alge = fonte.render("Atacar Algébrico", True, (255, 255, 255))
+            texto_alge_rect = texto_alge.get_rect(center=(1000, 340))
+            self.__context.screen().blit(texto_alge, texto_alge_rect)
 
     def getAnimation(self) -> list[Animation]:            
         return self.__animations
@@ -101,7 +116,6 @@ class Engine:
                 self.eventFunctionManager.Emit(EventFunctionManager.EventType.MOUSE_MOVE, { "event": SimpleNamespace(pos=pygame.mouse.get_pos())})
 
     def __handleAnimationLoop(self):
-        print(self.__animations)
         for anim in self.__animations:
             anim.update(self.__context.delta())
             if anim.isFinished():
@@ -155,5 +169,10 @@ class GameInstance(IGameInstance):
         return self
     
     def addAnimation(self, animation: Animation) -> Self:
+        self.getEngine().addAnimation(animation)
+        return self
+    
+    def startAnimation(self, animation: Animation):
+        animation.start()
         self.getEngine().addAnimation(animation)
         return self
